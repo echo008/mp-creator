@@ -32,16 +32,22 @@ function activate(context) {
             if (uri.fsPath === workspaceFolder.uri.fsPath) {
                 readdir(uri.fsPath).then(items => {
                     if (!items.length) {
-                        copy(path.join(__dirname, './templates/project'), uri.fsPath).then(() =>{
-                            const projectFile = path.join(uri.fsPath, './project.config.json')
-                            const sourceData = {
-                                libVersion: '2.3.0',
-                                appid: 'wx51e18b2431eeae26',
-                                projectname: vscode.workspace.getWorkspaceFolder(uri).name
+                        vscode.window.showInputBox({placeHolder: 'please input appid', prompt: '小程序appid'}).then(appid => {
+                            if (appid !== undefined) {
+                                copy(path.join(__dirname, './templates/project'), uri.fsPath).then(() =>{
+                                    const projectFile = path.join(uri.fsPath, './project.config.json')
+                                    const sourceData = {
+                                        libVersion: '2.4.0',
+                                        appid,
+                                        projectname: vscode.workspace.getWorkspaceFolder(uri).name
+                                    }
+                                    replaceFile(projectFile, projectFile, sourceData)
+                                }).catch(err => {
+                                    vscode.window.showErrorMessage('请保持根目录为一个空目录')
+                                })
+                            } else {
+                                vscode.window.showErrorMessage('请输入小程序appid')
                             }
-                            replaceFile(projectFile, projectFile, sourceData)
-                        }).catch(err => {
-                            vscode.window.showErrorMessage('请保持根目录为一个空目录')
                         })
                     } else {
                         vscode.window.showErrorMessage('请保持根目录为一个空目录')
@@ -56,52 +62,60 @@ function activate(context) {
         if (!isRoot) vscode.window.showErrorMessage('请在根目录下新建小程序项目')
     }))
     context.subscriptions.push(vscode.commands.registerCommand('extension.createPage', function (uri) {
-        vscode.window.showInputBox({placeHolder: 'please input file name', value: 'index', prompt: 'test'}).then(currentPath => {
-            const rootPath = vscode.workspace.getWorkspaceFolder(uri).uri.fsPath
-            const filepath = `${path.relative(rootPath, uri.fsPath).replace('\\', '/')}/${currentPath}`
-            const sourceData = {
-                filepath
-            }
-            const wxmlSrcFile = path.join(__dirname, './templates/page/template.wxml')
-            const wxmlDestFile = path.join(uri.fsPath, `./${currentPath}.wxml`)
-            replaceFile(wxmlSrcFile, wxmlDestFile, sourceData)
-            const jsSrcFile = path.join(__dirname, './templates/page/template.js')
-            const jsDestFile = path.join(uri.fsPath, `./${currentPath}.js`)
-            replaceFile(jsSrcFile, jsDestFile, sourceData)
-            const wxssSrcFile = path.join(__dirname, './templates/page/template.wxss')
-            const wxssDestFile = path.join(uri.fsPath, `./${currentPath}.wxss`)
-            replaceFile(wxssSrcFile, wxssDestFile, sourceData)
-            const jsonSrcFile = path.join(__dirname, './templates/page/template.json')
-            const jsonDestFile = path.join(uri.fsPath, `./${currentPath}.json`)
-            copy(jsonSrcFile, jsonDestFile)
-
-            const appFile = path.join(rootPath, './app.json')
-            readJSON(appFile).then(jsonData => {
-                if (jsonData.pages.indexOf(filepath) === -1) {
-                    jsonData.pages.push(filepath)
+        vscode.window.showInputBox({placeHolder: 'please input Page name', value: 'index', prompt: '页面名称'}).then(currentPath => {
+            if (currentPath !== undefined) {
+                const rootPath = vscode.workspace.getWorkspaceFolder(uri).uri.fsPath
+                const filepath = `${path.relative(rootPath, uri.fsPath).replace('\\', '/')}/${currentPath}`
+                const sourceData = {
+                    filepath
                 }
-                writeJSONFile(appFile, jsonData)
-            })
+                const wxmlSrcFile = path.join(__dirname, './templates/page/template.wxml')
+                const wxmlDestFile = path.join(uri.fsPath, `./${currentPath}.wxml`)
+                replaceFile(wxmlSrcFile, wxmlDestFile, sourceData)
+                const jsSrcFile = path.join(__dirname, './templates/page/template.js')
+                const jsDestFile = path.join(uri.fsPath, `./${currentPath}.js`)
+                replaceFile(jsSrcFile, jsDestFile, sourceData)
+                const wxssSrcFile = path.join(__dirname, './templates/page/template.wxss')
+                const wxssDestFile = path.join(uri.fsPath, `./${currentPath}.wxss`)
+                replaceFile(wxssSrcFile, wxssDestFile, sourceData)
+                const jsonSrcFile = path.join(__dirname, './templates/page/template.json')
+                const jsonDestFile = path.join(uri.fsPath, `./${currentPath}.json`)
+                copy(jsonSrcFile, jsonDestFile)
+
+                const appFile = path.join(rootPath, './app.json')
+                readJSON(appFile).then(jsonData => {
+                    if (jsonData.pages.indexOf(filepath) === -1) {
+                        jsonData.pages.push(filepath)
+                    }
+                    writeJSONFile(appFile, jsonData)
+                })
+            } else {
+                vscode.window.showErrorMessage('请输入Page name')
+            }
         })
     }))
     context.subscriptions.push(vscode.commands.registerCommand('extension.createComponent', function (uri) {
-        vscode.window.showInputBox({placeHolder: 'please input file name', value: 'index', prompt: 'test'}).then(currentPath => {
-            const filepath = `${path.relative(vscode.workspace.getWorkspaceFolder(uri).uri.fsPath, uri.fsPath).replace('\\', '/')}/${currentPath}`
-            const sourceData = {
-                filepath
+        vscode.window.showInputBox({placeHolder: 'please input Component name', value: 'index', prompt: '组件名称'}).then(currentPath => {
+            if (currentPath !== undefined) {
+                const filepath = `${path.relative(vscode.workspace.getWorkspaceFolder(uri).uri.fsPath, uri.fsPath).replace('\\', '/')}/${currentPath}`
+                const sourceData = {
+                    filepath
+                }
+                const wxmlSrcFile = path.join(__dirname, './templates/component/template.wxml')
+                const wxmlDestFile = path.join(uri.fsPath, `./${currentPath}.wxml`)
+                replaceFile(wxmlSrcFile, wxmlDestFile, sourceData)
+                const jsSrcFile = path.join(__dirname, './templates/component/template.js')
+                const jsDestFile = path.join(uri.fsPath, `./${currentPath}.js`)
+                replaceFile(jsSrcFile, jsDestFile, sourceData)
+                const wxssSrcFile = path.join(__dirname, './templates/component/template.wxss')
+                const wxssDestFile = path.join(uri.fsPath, `./${currentPath}.wxss`)
+                replaceFile(wxssSrcFile, wxssDestFile, sourceData)
+                const jsonSrcFile = path.join(__dirname, './templates/component/template.json')
+                const jsonDestFile = path.join(uri.fsPath, `./${currentPath}.json`)
+                copy(jsonSrcFile, jsonDestFile)
+            } else {
+                vscode.window.showErrorMessage('请输入Component name')
             }
-            const wxmlSrcFile = path.join(__dirname, './templates/component/template.wxml')
-            const wxmlDestFile = path.join(uri.fsPath, `./${currentPath}.wxml`)
-            replaceFile(wxmlSrcFile, wxmlDestFile, sourceData)
-            const jsSrcFile = path.join(__dirname, './templates/component/template.js')
-            const jsDestFile = path.join(uri.fsPath, `./${currentPath}.js`)
-            replaceFile(jsSrcFile, jsDestFile, sourceData)
-            const wxssSrcFile = path.join(__dirname, './templates/component/template.wxss')
-            const wxssDestFile = path.join(uri.fsPath, `./${currentPath}.wxss`)
-            replaceFile(wxssSrcFile, wxssDestFile, sourceData)
-            const jsonSrcFile = path.join(__dirname, './templates/component/template.json')
-            const jsonDestFile = path.join(uri.fsPath, `./${currentPath}.json`)
-            copy(jsonSrcFile, jsonDestFile)
         })
     }))
 }

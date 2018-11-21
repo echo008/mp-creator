@@ -2,11 +2,18 @@
     "name": "mp-creator",
     "displayName": "mp-creator",
     "description": "A mini-project creator",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "publisher": "echo008",
     "engines": {
-        "vscode": "^1.29.0"
+        "vscode": "^1.19.0"
     },
+    "keywords": [
+        "小程序",
+        "component",
+        "template",
+        "wxml",
+        "mpvue,wepy"
+    ],
     "categories": [
         "Other"
     ],
