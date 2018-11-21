@@ -1,0 +1,91 @@
+{
+    "name": "mp-creator",
+    "displayName": "mp-creator",
+    "description": "A mini-project creator",
+    "version": "0.0.1",
+    "publisher": "echo008",
+    "engines": {
+        "vscode": "^1.29.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:extension.createProject",
+        "onCommand:extension.createPage",
+        "onCommand:extension.createComponent"
+    ],
+    "main": "./extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.createProject",
+                "title": "新建小程序"
+            },
+            {
+                "command": "extension.createPage",
+                "title": "新建 Page"
+            },
+            {
+                "command": "extension.createComponent",
+                "title": "新建 Component"
+            }
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "command": "extension.createProject",
+                    "when": "explorerResourceIsFolder",
+                    "group": "navigation"
+                },
+                {
+                    "command": "extension.createPage",
+                    "when": "explorerResourceIsFolder",
+                    "group": "navigation"
+                },
+                {
+                    "command": "extension.createComponent",
+                    "when": "explorerResourceIsFolder",
+                    "group": "navigation"
+                }
+            ]
+        },
+        "keybindings": [
+            {
+                "command": "extension.createProject",
+                "key": "ctrl+shift+m",
+                "when": "explorerResourceIsFolder"
+            },
+            {
+                "command": "extension.createPage",
+                "key": "ctrl+shift+p",
+                "when": "explorerResourceIsFolder"
+            },
+            {
+                "command": "extension.createComponent",
+                "key": "ctrl+shift+c",
+                "when": "explorerResourceIsFolder"
+            }
+        ]
+    },
+    "scripts": {
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/echo008/mp-creator.git"
+    },
+    "devDependencies": {
+        "@types/mocha": "^2.2.42",
+        "@types/node": "^8.10.25",
+        "eslint": "^4.11.0",
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.21"
+    },
+    "dependencies": {
+        "dot": "^1.1.2",
+        "fs-extra": "^7.0.1",
+        "universalify": "^0.1.2"
+    }
+}
